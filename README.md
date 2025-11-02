@@ -21,7 +21,7 @@ Downloading the project is faster and more reliable.
   * Download the project.
   * Change `gwent.js` to point to the host player's IP.
     * For example, `const socket = new WebSocket('ws://192.168.178.20:8080');`   (`wss`, _not_ `ws`)
-  * Open index.html.
+  * Open index.html in the browser.
 * Host player (someone needs to run the server):
   * Install Node.js.
   * Opan a command prompt window in the project root folder.
