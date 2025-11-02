@@ -1,5 +1,6 @@
 # About
-Play Gwent (the classic Witcher 3 version) in the browser against another human opponent in multiplayer.
+Play Gwent (the classic Witcher 3 version) in the browser against another human opponent.
+Full complete multiplayer, every card and ability functional (let me know if not).
 Tweaked variant of Leo-Felde's multiplayer Gwent project (https://github.com/Leo-Felde/gwent-multiplayer) with the following changes:
 * Fixed some issues where both clients would desynchronize.
   * Overall replication of "which card did the client draw/select/revive/etc" is now always done based on filename instead of hand/deck/graveyard index, which seemed to be unreliable.
