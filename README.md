@@ -1,0 +1,2 @@
+Tweaked variant of Leo-Felde's multiplayer Gwent project (https://github.com/Leo-Felde/gwent-multiplayer) with some minor fixes to prevent desyncs.
+Also some minor line change to gwent.js to still work if specifically deploying this app to Render.
