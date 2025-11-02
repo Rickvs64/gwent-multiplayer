@@ -1,21 +1,13 @@
-const WebSocket = require('ws');
-
-const PORT = process.env.PORT || 6464;
-const wss = new WebSocket.Server({ port: PORT });
-
-
-
 const express = require("express");
 const http = require("http");
-const server = http.createServer(app);
+const WebSocket = require("ws");
+const path = require("path");
+
 const app = express();
-// --- Serve your client files ---
-app.use(express.static(__dirname));  // serve everything in root
-app.get("*", (_, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
-});
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
 
-
+const PORT = process.env.PORT || 8080;
 
 let sessions = {};
 let players = [];
@@ -30,6 +22,12 @@ function generateCode() {
   }
   return code;
 }
+
+// Serve all client files (index.html, JS, CSS, etc.)
+app.use(express.static(__dirname));
+app.get("*", (_, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
 
 wss.on('connection', (ws) => {
   ws.playerId = nextPlayerId++;
@@ -158,4 +156,4 @@ wss.on('connection', (ws) => {
   });
 });
 
-console.log(`## Server is up and running ##`);
+server.listen(PORT, () => console.log(`## Server running on port ${PORT} ##`));
