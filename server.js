@@ -3,6 +3,12 @@ const WebSocket = require('ws');
 const PORT = process.env.PORT || 6464;
 const wss = new WebSocket.Server({ port: PORT });
 
+// --- Serve your client files ---
+app.use(express.static(__dirname));  // serve everything in root
+app.get("*", (_, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
+
 let sessions = {};
 let players = [];
 let nextPlayerId = 1;
