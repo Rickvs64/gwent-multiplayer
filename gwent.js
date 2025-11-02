@@ -3,8 +3,8 @@
 class Controller {}
 
 // Websocket and Server config.
-// const socket = new WebSocket('ws://127.0.0.1:8080');				// Example line for when using local installation instead of remote deployment.
-const socket = new WebSocket('wss://gwent-render.onrender.com');	// Websocket + server is expected to be reachable on this URL.
+// const socket = new WebSocket('ws://localhost:8080');				// Example line for when using local installation instead of remote deployment.
+const socket = new WebSocket('wss://gwent-render.onrender.com');	// Websocket + server is expected to be reachable on this URL. Disable if using local installation.
 let amReady = false;
 let oponentReady = false;
 let playerId = null;
