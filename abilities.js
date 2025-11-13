@@ -541,8 +541,56 @@ var ability_dict = {
 	crach_an_craite: {
 		description: "Shuffle all cards from each player's graveyard back into their decks.",
 		activated: async card => {
-			Promise.all(card.holder.grave.cards.map(c => board.toDeck(c, card.holder.grave)));
-			await Promise.all(card.holder.opponent().grave.cards.map(c => board.toDeck(c, card.holder.opponent().grave)));
+			// Edit by Rick: Everything below is new.
+			// Previous version let both clients individually add the cards back to the deck at random positions. Problematic as then the next deck draw (e.g. Spy cards) will draw a different card per client.
+			// This would be subject to desyncs to matter the below board.toDeck() implementation as decks are specifically implemented via overrides in gwent.js to always add new cards at a random index.
+			// Secondly, graveyard order is inconsistent between clients so even if these cards are returned to the bottom of the deck you run the risk of *eventually* drawing these inconsistently ordered cards.
+			// First I tried fixing this with sockets (both clients run the visual logic but afterwards the OP dictates both players' new decks similar to the start of the round after card redraw is implemented).
+			// Had some input await issues there so plan B (current) is to just sort the graveyards and then append them to the end of each player's deck.
+			// OLD: Promise.all(card.holder.grave.cards.map(c => board.toDeck(c, card.holder.grave)));
+			// OLD: await Promise.all(card.holder.opponent().grave.cards.map(c => board.toDeck(c, card.holder.opponent().grave)));
+			
+			// Deterministic: sort grave cards by filename so both clients iterate same order.
+			const meGraveSorted = [...card.holder.grave.cards].sort((a,b) => (a.filename || "").localeCompare(b.filename || ""));
+			const opGraveSorted = [...card.holder.opponent().grave.cards].sort((a,b) => (a.filename || "").localeCompare(b.filename || ""));
+
+			// Helper to move a card visually then deterministically append to bottom of the deck.
+			const moveToDeckBottom = async (c, holder) => {
+				const source = holder.grave;
+				const deck = holder.deck;
+
+				// Run the existing translateTo visual step (same as moveTo does).
+				// moveTo used 'await translateTo(...)' in gwent.js — translateTo is synchronous-ish but awaiting is harmless.
+				await translateTo(c, source, deck);
+
+				// Remove the card from the source container (updates arrays + DOM).
+				// This mirrors what moveTo did (source.removeCard(card)).
+				source.removeCard(c);
+
+				// Append to the bottom of the deck array deterministically.
+				deck.cards.push(c);
+
+				// Keep card metadata consistent.
+				c.row = "deck";
+				c.holder = holder;
+
+				// Ensure visual representation matches the deck array (use existing deck helpers).
+				deck.addCardElement();
+				deck.resize();
+			};
+
+			// Move all my grave cards to bottom (deterministic order).
+			for (const c of meGraveSorted) {
+				await moveToDeckBottom(c, card.holder);
+			}
+
+			// Move all opponent grave cards to bottom (deterministic order).
+			for (const c of opGraveSorted) {
+				await moveToDeckBottom(c, card.holder.opponent());
+			}
+
+			// Small async yield so any pending UI/handlers can process; not a hack, just a safe tick.
+			await Promise.resolve();
 		},
 		weight: (card, ai, max, data) => {
 			if( game.roundCount < 2)
