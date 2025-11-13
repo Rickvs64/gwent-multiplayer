@@ -8,6 +8,7 @@ Tweaked variant of Leo-Felde's multiplayer Gwent project (https://github.com/Leo
   * Monster faction ability now keeps the strongest card on the board after every round; previously it would choose a random card that differs per client.
   * Skellige faction ability now revives the two strongest cards at the start of round 3; previously it would choose a random card that differs per client.
   * Eredin's leader card that discards two cards and selects one from deck now properly refreshes hand carousel between steps and replicates selected cards; previously it would fail to inform the opponent of both actions correctly.
+  * Crach's leader card that shuffles cards back into the deck now sorts graveyard and then adds them to the BOTTOM of the deck; previously it would literally shuffle them directly into the deck - with both graveyard and deck order being inconsistent per client.
 * Changed `gwent.js` and `server.js` structure to specifically support deployment on online platforms such as render.com.
   * Local play still works, see below.
 * Some more minor things my dumb ass forgot to annotate in code.
