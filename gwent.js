@@ -3,7 +3,7 @@
 class Controller {}
 
 // Websocket and Server config.
-// const socket = new WebSocket('ws://localhost:8080');				// Example line for when using local installation instead of remote deployment.
+// const socket = new WebSocket('ws://127.0.0.1:8080');				// Example line for when using local installation instead of remote deployment.
 const socket = new WebSocket('wss://gwent-render.onrender.com');	// Websocket + server is expected to be reachable on this URL. Disable if using local installation.
 let amReady = false;
 let opponentReady = false;
@@ -15,6 +15,8 @@ const isOpponentReadyElem = document.getElementById("opponent-ready");
 const passButton = document.getElementById("pass-button");
 const customizationElem = document.getElementById("deck-customization");
 const gameStartControlsElem = document.getElementById("session-start-control");
+
+let debug = false;
 
 socket.onmessage = async(event) => {
     console.log('[socket raw event.data]', event.data);
@@ -1142,7 +1144,10 @@ class Game {
 	
 	// Allows the player to swap out up to two cards from their iniitial hand
 	async initialRedraw(){
-		await ui.queueCarousel(player_me.hand, 2, async (c, i) => await player_me.deck.swap(c, c.removeCard(i)), c => true, true, true, "Choose up to 2 cards to redraw.");
+		if (debug == true)
+			await ui.queueCarousel(player_me.hand, 99, async (c, i) => await player_me.deck.swap(c, c.removeCard(i)), c => true, true, true, "Choose up to 99 cards to redraw.");
+		else
+			await ui.queueCarousel(player_me.hand, 2, async (c, i) => await player_me.deck.swap(c, c.removeCard(i)), c => true, true, true, "Choose up to 2 cards to redraw.");
 		ui.enablePlayer(false);
 
 		socket.send(JSON.stringify({ type: "initial_reDraw", hand: removeCircularReferences(player_me.hand.cards), deck: removeCircularReferences(player_me.deck.cards) }));
